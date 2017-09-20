@@ -8,9 +8,19 @@ namespace bban_validator
     {
         static void Main(string[] args)
         {
-            string userBankNumber = Console.ReadLine();
-            // Test for bank number validity. Returns a boolean.
-            Utilities.BBAN_Validate(userBankNumber);
+            // Get user to input a bank number. Repeat if necessary.
+            Tuple<bool, string> bankNumber = null;
+            while (bankNumber == null)
+            {
+                bankNumber = Utilities.InputBankNumber();
+            }
+            // Change bank number into machine format and test for validity.
+            bankNumber = Utilities.Validate(bankNumber);
+
+            // Change from BBAN to IBAN
+            if (bankNumber != null && bankNumber.Item1 == false)
+                bankNumber = Utilities.BBANtoIBAN(bankNumber);
+            
             Console.ReadKey();
         }
     }
