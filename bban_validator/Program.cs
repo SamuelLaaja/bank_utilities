@@ -1,6 +1,8 @@
 ﻿using System;
 using Ekoodi.Utilities.Test;
-
+//472010225440
+//123456785
+//159030776
 // Program for testing Task1 from Ekoodi.Utilities
 namespace bban_validator
 {
@@ -19,7 +21,7 @@ namespace bban_validator
 
             // Change from BBAN to IBAN
             bankNumber = Utilities.BBANtoIBAN(bankNumber);
-            
+            Utilities.BIC(bankNumber);
             Console.ReadKey();
         }
     }
