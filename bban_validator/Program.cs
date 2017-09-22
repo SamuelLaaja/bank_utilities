@@ -18,8 +18,7 @@ namespace bban_validator
             bankNumber = Utilities.Validate(bankNumber);
 
             // Change from BBAN to IBAN
-            if (bankNumber != null && bankNumber.Item1 == false)
-                bankNumber = Utilities.BBANtoIBAN(bankNumber);
+            bankNumber = Utilities.BBANtoIBAN(bankNumber);
             
             Console.ReadKey();
         }
