@@ -79,7 +79,11 @@ namespace ReferenceNumbers
                         
 
             // Add spaces every 5 numbers for clarity
-            
+            if (refNumberCleanedUp.Length > 5){
+	            for (int i = 5; i < refNumberCleanedUp.Length; i+5){
+	            	refNumber = refNumberCleanedUp.Insert(refNumberCleanedUp[i], " ");
+	            }
+            }
 
             return new Tuple <bool, string> (false, refNumber);
         }
