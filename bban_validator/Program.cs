@@ -1,28 +1,62 @@
 ﻿using System;
-using Ekoodi.Utilities.Test;
-//472010225440
-//123456785
-//159030776
-// Program for testing Task1 from Ekoodi.Utilities
-namespace bban_validator
+using Bank;
+
+// Example bank numbers
+// FI4250001510000023
+// 472010225440
+// 123456785
+// 159030776
+
+namespace Bank_Program
 {
+    // Program for testing Ekoodi.Utilities class methods
     class Program
     {
         static void Main(string[] args)
         {
-            // Get user to input a bank number. Repeat if necessary.
-            Tuple<bool, string> bankNumber = null;
-            while (bankNumber == null)
+            try
             {
-                bankNumber = Utilities.InputBankNumber();
-            }
-            // Change bank number into machine format and test for validity.
-            bankNumber = Utilities.Validate(bankNumber);
 
-            // Change from BBAN to IBAN
-            bankNumber = Utilities.BBANtoIBAN(bankNumber);
-            Utilities.BIC(bankNumber);
+                // Tuple boolean determines if BBAN or IBAN. null if invalid number.
+                Tuple<bool, string> bankNumberTuple = null;
+                // Get user to input a bank number. 
+                Console.WriteLine("Please write a bank account number (BBAN or IBAN) 8-14 numbers:");
+                bankNumberTuple = Input.InputBankNumber(Console.ReadLine());
+                
+
+                bankNumberTuple = MachineFormat.MachineReadable(bankNumberTuple);
+                Console.WriteLine("Machine readable version: " + bankNumberTuple.Item2);
+
+                // Change bank number into machine format and test for validity.
+                Console.WriteLine("Testing for BBAN/IBAN validity...");
+                bankNumberTuple = Validation.Validate(bankNumberTuple);
+
+                if (bankNumberTuple == null)
+                {
+                    Console.WriteLine("Bank number is NOT valid.");
+                }
+                else
+                {
+                    String bankFormat = bankNumberTuple.Item1 ? "IBAN" : "BBAN";
+                    Console.WriteLine("{0} is valid {1}.", bankNumberTuple.Item2, bankFormat);
+
+                    if (!bankNumberTuple.Item1)
+                    {
+                        Console.WriteLine("Changing BBAN number to IBAN format: ");
+                        bankNumberTuple = BBANtoIBAN.ChangeBBANtoIBAN(bankNumberTuple);
+                        Console.WriteLine(bankNumberTuple.Item2);
+                    }
+
+                    Console.WriteLine("Trying to find matching BIC code:");
+                    Console.WriteLine(BIC.BIC_Define(bankNumberTuple));
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
             Console.ReadKey();
         }
     }
 }
+
