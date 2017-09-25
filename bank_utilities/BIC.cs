@@ -24,6 +24,8 @@ namespace Bank
         // Prints out BIC
         public static string BIC_Define(Tuple<bool, string> bankNumber)
         {
+            string bicPath = "bic_codes.json";
+
             if (bankNumber != null)
             {
                 //Requires IBAN number. Attempts automatic format change
@@ -55,7 +57,7 @@ namespace Bank
                     }
 
                     List<BicCode> bicCodes = new List<BicCode>();
-                    using (FileStream fs = new FileStream("bic_codes.json", FileMode.Open))
+                    using (FileStream fs = new FileStream(bicPath, FileMode.Open))
                     {
                         using (StreamReader r = new StreamReader(fs))
                         {

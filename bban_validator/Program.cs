@@ -1,5 +1,6 @@
 ﻿using System;
 using Bank;
+using ReferenceNumbers;
 
 // Example bank numbers
 // FI4250001510000023
@@ -16,10 +17,9 @@ namespace Bank_Program
         {
             try
             {
-
-                // Tuple boolean determines if BBAN or IBAN. null if invalid number.
+                // Tuple boolean is used to determine if bank number is BBAN or IBAN. null if invalid number.
                 Tuple<bool, string> bankNumberTuple = null;
-                // Get user to input a bank number. 
+                // Get user to input a bank number.
                 Console.WriteLine("Please write a bank account number (BBAN or IBAN) 8-14 numbers:");
                 bankNumberTuple = Input.InputBankNumber(Console.ReadLine());
                 
@@ -55,6 +55,29 @@ namespace Bank_Program
             {
                 Console.WriteLine(ex.Message);
             }
+
+
+            // Reference number method calls
+            try
+            {
+                Tuple<bool, string> referenceNumberTuple = null;
+                Console.WriteLine("Please write a reference number (national) 4-20 numbers:");
+                referenceNumberTuple = ReferenceNumbers.National.InputReferenceNumber(Console.ReadLine());
+
+                if (referenceNumberTuple == null)
+                {
+                    Console.WriteLine("Reference number is NOT valid.");
+                }
+                else
+                {
+                    Console.WriteLine(referenceNumberTuple.Item2);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
             Console.ReadKey();
         }
     }

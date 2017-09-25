@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\bank_utilities\bank_utilities.csproj" />
+    <ProjectReference Include="..\ReferenceNumbers\ReferenceNumbers.csproj" />
   </ItemGroup>
 
 </Project>
