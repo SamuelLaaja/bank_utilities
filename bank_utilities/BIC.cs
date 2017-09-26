@@ -66,8 +66,6 @@ namespace Bank
                         }
                     }
 
-                    int i = 0;
-
                     var bicCode = bicCodes.Find(c => c.Id == bankGroup);
 
                     if(bicCode != null)

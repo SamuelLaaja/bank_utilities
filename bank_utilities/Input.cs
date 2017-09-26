@@ -10,6 +10,12 @@ namespace Bank
             bankNumber.ToUpper();
             bool isIBAN = false;
 
+            if (bankNumber == String.Empty)
+            {
+                Exception ex = new FormatException("Skipping to next part...");
+                throw ex;
+            }
+
             if (bankNumber.Length < 4)
             {
                 Exception ex = new FormatException("Bank number is too short!");
