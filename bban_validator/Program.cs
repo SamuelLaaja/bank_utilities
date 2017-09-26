@@ -17,7 +17,7 @@ namespace Bank_Program
         {
             //Should fix Console ä ö å problems
             Console.OutputEncoding = System.Text.Encoding.UTF8;
-            International.ReplaceLetters(Console.ReadLine());
+
             try
             {
                 // Tuple boolean is used to determine if bank number is BBAN or IBAN. null if invalid number.
