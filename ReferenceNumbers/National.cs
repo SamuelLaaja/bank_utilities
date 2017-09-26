@@ -1,20 +1,18 @@
 ﻿using System;
-using System.Numerics;
 
 namespace ReferenceNumbers
 {
     public class National
     {
-        public static string EnsureCorrectInput(string refNumber)
+        public static string EnsureCorrectInput(string refNumber, bool isInternational = false)
         {
-
             string refNumberCleanedUp = String.Empty;
             bool untilNonZero = false;
             // Remove letters from basic bank numbers
             for (int i = 0; i < refNumber.Length; i++)
             {
                 // Remove letters, spaces and punctuation marks from user string.
-                if (Char.IsNumber(refNumber[i]))
+                if (isInternational ? Char.IsLetterOrDigit(refNumber[i]) : Char.IsNumber(refNumber[i]))
                 {
                     // Remove zeros from the beginning
                     if (untilNonZero || refNumber[i] != '0')
@@ -24,7 +22,6 @@ namespace ReferenceNumbers
                     }
                 }
             }
-
 
             if (refNumberCleanedUp.Length < 3)
             {
@@ -44,13 +41,14 @@ namespace ReferenceNumbers
         {
             int w = 7;
             int sum = 0;
-            // Calculate validation number
+            // Calculate validation number, starting from end
             for (int i = refNumber.Length-1; i >= 0; i--)
             {
                 int weightedNumber;
                 int.TryParse(new string(refNumber[i], 1), out weightedNumber);
 
-                // Multiply by 7,3,1,7,3,1... for correct weighting
+                // Multiply with 7,3,1,7,3,1... for correct weighting
+                // WeightedNumber result can be between 0-81. 
                 weightedNumber *= w;
 
                 switch (w)
@@ -65,23 +63,20 @@ namespace ReferenceNumbers
                         w = 7;
                         break;
                 }
-
-                // WeightedNumber result can be between 0-81. 
-                // Calculate 1 and 8 separately by separating 18 into tenth division (int whole number) and remainder of tenth division (modulo)
-                // Then sum those together and add to total sum variable
+                // Add to total sum
                 sum += weightedNumber;
             }
             
             // Calculate the next 10-divisible number from sum
             int checksum = (int)Math.Ceiling(sum * 0.1) * 10;
 
-            // Insert validation number to the end.
+            // Insert (checksum - sum) validation number to the end.
             refNumber = refNumber.Insert(refNumber.Length, String.Join(String.Empty, (checksum - sum)));
-            refNumber = WhiteSpaces(refNumber);
             
             return refNumber;
         }
 
+        // Generates a string array full of valid ref numbers using basePart as foundation
         public static string[] Generate(string basePart, int amount)
         {
             try
@@ -102,7 +97,7 @@ namespace ReferenceNumbers
             return null;
         }
 
-        // Add spaces every 5 numbers for clarity
+        // Add spaces every 5 numbers for clarity, starting from right side
         public static string WhiteSpaces(string refNumber) {
 
             int refLength = refNumber.Length;

@@ -15,6 +15,9 @@ namespace Bank_Program
     {
         static void Main(string[] args)
         {
+            //Should fix Console ä ö å problems
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+            International.ReplaceLetters(Console.ReadLine());
             try
             {
                 // Tuple boolean is used to determine if bank number is BBAN or IBAN. null if invalid number.
@@ -63,7 +66,8 @@ namespace Bank_Program
             {
                 Console.WriteLine("Please write a (national) reference number's base part (3-19 numbers) and optionally end with a validation number:");
                 string refNumberBase = Console.ReadLine();
-                refNumberBase = National.EnsureCorrectInput(refNumberBase);
+                bool isInternational = International.IsInternational(refNumberBase);
+                refNumberBase = National.EnsureCorrectInput(refNumberBase, isInternational);
 
                 Console.WriteLine("How many reference numbers you want to generate, if any:");
                 string amount = Console.ReadLine();
@@ -74,8 +78,8 @@ namespace Bank_Program
                 {
                     //Checks if the given last number matches with program-generated last number (whitespaces included)
                     string refValid = National.ValidifyReferenceNumber(refNumberBase.Substring(0, refNumberBase.Length-1));
-                    if (refValid.Equals(National.WhiteSpaces(refNumberBase)))
-                        Console.WriteLine(refValid + " - OK");
+                    if (refValid.Equals(refNumberBase))
+                        Console.WriteLine(National.WhiteSpaces(refValid) + " - OK");
                     else
                     {
                         Console.WriteLine("Reference number is incorrect!");
@@ -86,8 +90,9 @@ namespace Bank_Program
                 {
                     string[] refGenerated = National.Generate(refNumberBase, amountInt);
                     for (int i = 0; i < refGenerated.Length; i++)
-                    {
-                        Console.WriteLine(refGenerated[i]);
+                    {                        
+                        // Add white spaces and print all generated numbers
+                        Console.WriteLine(National.WhiteSpaces(refGenerated[i]));
                     }
                 }
             }
