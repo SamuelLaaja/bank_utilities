@@ -23,11 +23,10 @@ namespace Bank_Program
                 Console.WriteLine("Please write a bank account number (BBAN or IBAN) 8-14 numbers:");
                 bankNumberTuple = Input.InputBankNumber(Console.ReadLine());
                 
-
+                // Change bank number into machine format
                 bankNumberTuple = MachineFormat.MachineReadable(bankNumberTuple);
                 Console.WriteLine("Machine readable version: " + bankNumberTuple.Item2);
-
-                // Change bank number into machine format and test for validity.
+                // And test for validity.
                 Console.WriteLine("Testing for BBAN/IBAN validity...");
                 bankNumberTuple = Validation.Validate(bankNumberTuple);
 
@@ -39,7 +38,8 @@ namespace Bank_Program
                 {
                     String bankFormat = bankNumberTuple.Item1 ? "IBAN" : "BBAN";
                     Console.WriteLine("{0} is valid {1}.", bankNumberTuple.Item2, bankFormat);
-
+                    
+                    // If bank number is in BBAN format, change into IBAN
                     if (!bankNumberTuple.Item1)
                     {
                         Console.WriteLine("Changing BBAN number to IBAN format: ");
@@ -47,6 +47,7 @@ namespace Bank_Program
                         Console.WriteLine(bankNumberTuple.Item2);
                     }
 
+                    // Find BIC code from IBAN
                     Console.WriteLine("Trying to find matching BIC code:");
                     Console.WriteLine(BIC.BIC_Define(bankNumberTuple));
                 }
@@ -60,17 +61,34 @@ namespace Bank_Program
             // Reference number method calls
             try
             {
-                Tuple<bool, string> referenceNumberTuple = null;
-                Console.WriteLine("Please write a reference number (national) 4-20 numbers:");
-                referenceNumberTuple = ReferenceNumbers.National.InputReferenceNumber(Console.ReadLine());
+                Console.WriteLine("Please write a (national) reference number's base part (3-19 numbers) and optionally end with a validation number:");
+                string refNumberBase = Console.ReadLine();
+                refNumberBase = National.EnsureCorrectInput(refNumberBase);
 
-                if (referenceNumberTuple == null)
+                Console.WriteLine("How many reference numbers you want to generate, if any:");
+                string amount = Console.ReadLine();
+                int amountInt;
+                
+                // If user is not generating any numbers, check the validity of given number.
+                if (!int.TryParse(amount, out amountInt) || amountInt < 1)
                 {
-                    Console.WriteLine("Reference number is NOT valid.");
+                    //Checks if the given last number matches with program-generated last number (whitespaces included)
+                    string refValid = National.ValidifyReferenceNumber(refNumberBase.Substring(0, refNumberBase.Length-1));
+                    if (refValid.Equals(National.WhiteSpaces(refNumberBase)))
+                        Console.WriteLine(refValid + " - OK");
+                    else
+                    {
+                        Console.WriteLine("Reference number is incorrect!");
+                    }
                 }
+                // Otherwise generate given amount of reference numbers
                 else
                 {
-                    Console.WriteLine(referenceNumberTuple.Item2);
+                    string[] refGenerated = National.Generate(refNumberBase, amountInt);
+                    for (int i = 0; i < refGenerated.Length; i++)
+                    {
+                        Console.WriteLine(refGenerated[i]);
+                    }
                 }
             }
             catch (Exception ex)

@@ -5,17 +5,8 @@ namespace ReferenceNumbers
 {
     public class National
     {
-        public static Tuple<bool, string> InputReferenceNumber(string refNumber)
+        public static string EnsureCorrectInput(string refNumber)
         {
-            if (refNumber.Length < 3)
-            {
-                Exception ex = new FormatException("Reference number is too short!");
-                throw ex;
-            } else if (refNumber.Length > 19) {
-                Exception ex = new FormatException("Reference number is too long!");
-                throw ex;
-            }
-
 
             string refNumberCleanedUp = String.Empty;
             bool untilNonZero = false;
@@ -25,7 +16,6 @@ namespace ReferenceNumbers
                 // Remove letters, spaces and punctuation marks from user string.
                 if (Char.IsNumber(refNumber[i]))
                 {
-
                     // Remove zeros from the beginning
                     if (untilNonZero || refNumber[i] != '0')
                     {
@@ -34,14 +24,31 @@ namespace ReferenceNumbers
                     }
                 }
             }
-            
+
+
+            if (refNumberCleanedUp.Length < 3)
+            {
+                Exception ex = new FormatException("Reference number is too short!");
+                throw ex;
+            }
+            else if (refNumberCleanedUp.Length > 19)
+            {
+                Exception ex = new FormatException("Reference number is too long!");
+                throw ex;
+            }
+
+            return refNumberCleanedUp;
+        }
+
+        public static string ValidifyReferenceNumber(string refNumber)
+        {
             int w = 7;
             int sum = 0;
             // Calculate validation number
-            for (int i = refNumberCleanedUp.Length-1; i >= 0; i--)
+            for (int i = refNumber.Length-1; i >= 0; i--)
             {
                 int weightedNumber;
-                int.TryParse(new string(refNumberCleanedUp[i], 1), out weightedNumber);
+                int.TryParse(new string(refNumber[i], 1), out weightedNumber);
 
                 // Multiply by 7,3,1,7,3,1... for correct weighting
                 weightedNumber *= w;
@@ -59,29 +66,55 @@ namespace ReferenceNumbers
                         break;
                 }
 
-
                 // WeightedNumber result can be between 0-81. 
                 // Calculate 1 and 8 separately by separating 18 into tenth division (int whole number) and remainder of tenth division (modulo)
                 // Then sum those together and add to total sum variable
                 sum += weightedNumber;
-
-                Console.Write(weightedNumber + " ");
             }
             
             // Calculate the next 10-divisible number from sum
             int checksum = (int)Math.Ceiling(sum * 0.1) * 10;
 
-            Console.WriteLine("\n{0} - {1}", checksum, sum);
-
-            //Insert validation number as last number if not already so.
-            if (refNumberCleanedUp[refNumberCleanedUp.Length-1] != (checksum - sum).ToString()[0])
-            refNumber = refNumberCleanedUp.Insert(refNumberCleanedUp.Length, String.Join(String.Empty, (checksum - sum)));
-                        
-
-            // Add spaces every 5 numbers for clarity
+            // Insert validation number to the end.
+            refNumber = refNumber.Insert(refNumber.Length, String.Join(String.Empty, (checksum - sum)));
+            refNumber = WhiteSpaces(refNumber);
             
-
-            return new Tuple <bool, string> (false, refNumber);
+            return refNumber;
         }
+
+        public static string[] Generate(string basePart, int amount)
+        {
+            try
+            {
+                string[] generatedRefNumbers = new string[amount];
+                if (amount == 1)
+                    generatedRefNumbers[0] = ValidifyReferenceNumber(basePart);
+                else
+                    for (int i = 0; i < amount; i++)
+                    {
+                        generatedRefNumbers[i] = ValidifyReferenceNumber(basePart + String.Join(String.Empty, i+1));
+                    }
+                return generatedRefNumbers;
+            }
+            catch (Exception ex) {
+                Console.WriteLine(ex.Message);
+            }
+            return null;
+        }
+
+        // Add spaces every 5 numbers for clarity
+        public static string WhiteSpaces(string refNumber) {
+
+            int refLength = refNumber.Length;
+            if (refLength > 5)
+            {
+                for (int i = refLength-5; i > 0; i = i - 5)
+                {
+                    refNumber = refNumber.Insert(i, " ");
+                }
+            }
+            return refNumber;
+        }
+
     }
 }
