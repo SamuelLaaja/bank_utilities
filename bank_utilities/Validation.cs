@@ -14,8 +14,8 @@ namespace Bank
                 // Test for International Bank Account Number (IBAN) validity.
                 if (bankNumberTuple.Item1)
                 {
-                    // 'FI' area code as number + 00
-                    string country = "1518" + bankNumberTuple.Item2.Substring(2, 2);
+                    // 'XX' area code as number + 00
+                    string country = International.ReplaceLetters(bankNumberTuple.Item2.Substring(0, 4));
                     // Adds country code to the end of string
                     string IBANnewOrder = bankNumberTuple.Item2.Substring(4) + country;
                     string tempString = String.Empty;

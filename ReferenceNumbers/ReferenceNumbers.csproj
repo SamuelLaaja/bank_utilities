@@ -4,4 +4,8 @@
     <TargetFramework>netcoreapp1.1</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\bank_utilities\bank_utilities.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -46,7 +46,7 @@ namespace Bank_Program
                     if (!bankNumberTuple.Item1)
                     {
                         Console.WriteLine("Changing BBAN number to IBAN format: ");
-                        bankNumberTuple = BBANtoIBAN.ChangeBBANtoIBAN(bankNumberTuple);
+                        bankNumberTuple = new Tuple<bool,string>(true, International.ChangeToInternational(bankNumberTuple.Item2, "FI"));
                         Console.WriteLine(bankNumberTuple.Item2);
                     }
 
@@ -64,35 +64,43 @@ namespace Bank_Program
             // Reference number method calls
             try
             {
-                Console.WriteLine("Please write a (national) reference number's base part (3-19 numbers) and optionally end with a validation number:");
-                string refNumberBase = Console.ReadLine();
-                bool isInternational = International.IsInternational(refNumberBase);
-                refNumberBase = National.EnsureCorrectInput(refNumberBase, isInternational);
-
-                Console.WriteLine("How many reference numbers you want to generate, if any:");
-                string amount = Console.ReadLine();
+                Console.WriteLine("Please write a reference number (national or international).");
+                Console.WriteLine("Base part is 3-19 numbers and optionally end with one (1) validation number:");
+                string refNumber = Console.ReadLine();
+                bool isInternational = International.IsInternational(refNumber);
+                string amount = String.Empty;
+                refNumber = RefNumbers.EnsureCorrectInput(refNumber, isInternational);
+                Console.WriteLine(isInternational?"International reference number detected.":"National reference number detected.");
+                if (!isInternational) {
+                    Console.WriteLine("How many reference numbers (with validation numbers) you want to generate, if any:");
+                    amount = Console.ReadLine();
+                }
                 int amountInt;
                 
                 // If user is not generating any numbers, check the validity of given number.
                 if (!int.TryParse(amount, out amountInt) || amountInt < 1)
                 {
-                    //Checks if the given last number matches with program-generated last number (whitespaces included)
-                    string refValid = National.ValidifyReferenceNumber(refNumberBase.Substring(0, refNumberBase.Length-1));
-                    if (refValid.Equals(refNumberBase))
-                        Console.WriteLine(National.WhiteSpaces(refValid) + " - OK");
+                    //Checks if given validation number is correct
+                    bool refValid = RefNumbers.ValidifyReferenceNumber(refNumber, isInternational);
+                    if (refValid) {
+                        Console.WriteLine(RefNumbers.WhiteSpaces(refNumber) + " - OK");
+                        if (!isInternational)
+                            Console.WriteLine("International version: " + RefNumbers.WhiteSpaces(International.ChangeToInternational(refNumber, "RF")));
+                    }
                     else
                     {
                         Console.WriteLine("Reference number is incorrect!");
                     }
                 }
-                // Otherwise generate given amount of reference numbers
+                // Otherwise generate given amount of reference numbers (with validation numbers). Only national numbers can be generated.
                 else
                 {
-                    string[] refGenerated = National.Generate(refNumberBase, amountInt);
+                    string[] refGenerated = RefNumbers.Generate(refNumber, amountInt);
                     for (int i = 0; i < refGenerated.Length; i++)
                     {                        
                         // Add white spaces and print all generated numbers
-                        Console.WriteLine(National.WhiteSpaces(refGenerated[i]));
+                        // Also change into international format and print them out
+                        Console.WriteLine(RefNumbers.WhiteSpaces(refGenerated[i]) + "\t  International version:  " + RefNumbers.WhiteSpaces(International.ChangeToInternational(refGenerated[i], "RF")));
                     }
                 }
             }

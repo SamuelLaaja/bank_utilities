@@ -31,7 +31,7 @@ namespace Bank
                 //Requires IBAN number. Attempts automatic format change
                 if (bankNumber.Item1 == false)
                 {
-                    bankNumber = BBANtoIBAN.ChangeBBANtoIBAN(bankNumber);
+                    bankNumber = new Tuple<bool, string>(true, International.ChangeToInternational(bankNumber.Item2, "FI"));
                 }
 
                 if (bankNumber.Item1 == true)
