@@ -8,17 +8,19 @@ namespace ReferenceNumbers
         {
             string refNumberCleanedUp = String.Empty;
             bool untilNonZero = false;
-
-            for (int i = 0; i < refNumber.Length; i++)
+            if (refNumber != String.Empty)
             {
-                // Remove letters, spaces and punctuation marks from user string. Only numbers are allowed for national ref number.
-                if (isInternational ? Char.IsLetterOrDigit(refNumber[i]) : Char.IsNumber(refNumber[i]))
+                for (int i = 0; i < refNumber.Length; i++)
                 {
-                    // Remove zeros from the beginning
-                    if (untilNonZero || refNumber[i] != '0')
+                    // Remove letters, spaces and punctuation marks from user string. Only numbers are allowed for national ref number.
+                    if (isInternational ? Char.IsLetterOrDigit(refNumber[i]) : Char.IsNumber(refNumber[i]))
                     {
-                        refNumberCleanedUp += refNumber[i];
-                        untilNonZero = true;
+                        // Remove zeros from the beginning
+                        if (untilNonZero || refNumber[i] != '0')
+                        {
+                            refNumberCleanedUp += refNumber[i];
+                            untilNonZero = true;
+                        }
                     }
                 }
             }

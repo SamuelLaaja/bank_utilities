@@ -7,6 +7,12 @@ namespace Bank
         // Check if user string's first 4 characters are [letter,letter,number,number]. If so, it is international. Else it is national.
         public static bool IsInternational(string userString)
         {
+            if (userString.Equals(String.Empty))
+            {
+                Exception ex = new FormatException("No input given.");
+                throw ex;
+            }
+
             if (Char.IsLetter(userString[0]) && Char.IsLetter(userString[1]) && Char.IsNumber(userString[2]) && Char.IsNumber(userString[3]))
                 return true;
             else
