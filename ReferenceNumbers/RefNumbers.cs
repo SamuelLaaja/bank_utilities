@@ -44,10 +44,11 @@ namespace ReferenceNumbers
             // Test for International Reference Number validity.
             if (isInternational)
             {
-                // 'XX' area code as number + 00
-                string country = Bank.International.ReplaceLetters(refNumber.Substring(0, 4));
+                // Replaces letters with numbers
+                refNumber = Bank.International.ReplaceLetters(refNumber);
+                string country = refNumber.Substring(0, 6);
                 // Adds country code to the end of string
-                string newOrder = refNumber.Substring(4) + country;
+                string newOrder = refNumber.Substring(6) + country;
                 string tempString = String.Empty;
                 int tempInt = 0;
 

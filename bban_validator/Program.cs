@@ -77,10 +77,11 @@ namespace Bank_Program
                 }
                 int amountInt;
                 
-                // If user is not generating any numbers, check the validity of given number.
+                // If user is not generating any numbers (amount = 0 or null), check the validity of given number.
                 if (!int.TryParse(amount, out amountInt) || amountInt < 1)
                 {
                     //Checks if given validation number is correct
+                    Console.WriteLine("Checking reference number validity...");
                     bool refValid = RefNumbers.ValidifyReferenceNumber(refNumber, isInternational);
                     if (refValid) {
                         Console.WriteLine(RefNumbers.WhiteSpaces(refNumber) + " - OK");

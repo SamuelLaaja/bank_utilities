@@ -7,7 +7,7 @@ namespace Bank
         // Get user to input a bank number. Define if it is BBAN or IBAN and clean up spaces and special characters.
         public static Tuple<bool, string> InputBankNumber(string bankNumber)
         {
-            bankNumber.ToUpper();
+            bankNumber = bankNumber.ToUpper();
             bool isIBAN = false;
 
             if (bankNumber == String.Empty)
