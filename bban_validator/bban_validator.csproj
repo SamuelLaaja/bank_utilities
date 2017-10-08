@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\bank-barcode\bank-barcode.csproj" />
     <ProjectReference Include="..\bank_utilities\bank_utilities.csproj" />
     <ProjectReference Include="..\ReferenceNumbers\ReferenceNumbers.csproj" />
   </ItemGroup>

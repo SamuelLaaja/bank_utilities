@@ -16,7 +16,8 @@ namespace Bank
                 throw ex;
             }
 
-            if (bankNumber.Length < 4)
+            // Cannot do IBAN check if string is too short for it.
+            if ( bankNumber.Length < 4)
             {
                 Exception ex = new FormatException("Bank number is too short!");
                 throw ex;
