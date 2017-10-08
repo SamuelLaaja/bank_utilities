@@ -138,11 +138,7 @@ namespace Bank_Program
                         // refIsInternational (bool)
                         // invoice (string)
                         // dueDate (string)
-                    }
-                    else
-                    {
-                        Console.WriteLine("Thank you for using our services!");
-                    }
+                    }                    
                 }
             }
             catch (Exception e)

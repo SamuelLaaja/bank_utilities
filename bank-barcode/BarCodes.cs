@@ -22,20 +22,52 @@ namespace Barcode
     {
         public static string InputInvoice(string number)
         {
-            string cleanedUp = String.Empty;
+            char[] cleanedUp = "00000000".ToCharArray();
+            string tempCleanedUp = String.Empty;
+            int howManyDecimals = 0;
+            int i = 0;
 
-            for (int i = 0; i < number.Length; i++)
+            for (; i < number.Length; i++)
             {
-                // Remove lettera, spaces and punctuation marks excluding ,. from user string.
-                if (Char.IsDigit(number[i]) || number[i] == '.' || number[i] == ',')
+                // Resets decimal counter every time . or , is found
+                if (number[i] == '.' || number[i] == ',')
+                    howManyDecimals = 0;
+
+                // Remove letters, spaces and punctuation marks from user string.
+                if (Char.IsDigit(number[i]))
                 {
-                    cleanedUp += number[i];
+                    howManyDecimals++;
+                    tempCleanedUp += number[i];
                 }
             }
-            // Currently allows 0,0 euro payments to be done...
-            return cleanedUp;
+            int wholeNumberAmount = tempCleanedUp.Length - howManyDecimals;
+            if (wholeNumberAmount > 6) {
+                Exception e = new FormatException("Invoice amount has to be less than a million!");
+                throw e; 
+            }
+
+            //only first two decimals are accepted. No rounding, though.
+            howManyDecimals = Math.Min(howManyDecimals, 2);
+
+            for (i = 6-wholeNumberAmount; i < wholeNumberAmount+howManyDecimals; i++) {
+                cleanedUp[i] = tempCleanedUp[i];
+            }
+
+            tempCleanedUp = new string(cleanedUp);
+
+            if (tempCleanedUp =="00000000")
+            {
+                Exception e = new FormatException("Thank you for using our services!");
+                throw e;
+            }
+
+            // outputs 6 chars for euros, 2 chars for cents
+            return tempCleanedUp;
         }
 
+
+
+        // Error Index out of bounds with some inputs, like 123 or 001 002
 
         public static string InputDate(string number)
         {
