@@ -24,7 +24,7 @@ namespace Barcode
         {
             char[] cleanedUp = "00000000".ToCharArray();
             string tempCleanedUp = String.Empty;
-            int howManyDecimals = 0;
+            int howManyDecimals = -1;
             int i = 0;
 
             for (; i < number.Length; i++)
@@ -36,10 +36,15 @@ namespace Barcode
                 // Remove letters, spaces and punctuation marks from user string.
                 if (Char.IsDigit(number[i]))
                 {
+                    if (howManyDecimals > -1)
                     howManyDecimals++;
                     tempCleanedUp += number[i];
                 }
             }
+            // Not very pretty fix for inputs thats are wholenumbers only
+            if (howManyDecimals == -1)
+                howManyDecimals = 0;
+
             int wholeNumberAmount = tempCleanedUp.Length - howManyDecimals;
             if (wholeNumberAmount > 6) {
                 Exception e = new FormatException("Invoice amount has to be less than a million!");
@@ -49,8 +54,8 @@ namespace Barcode
             //only first two decimals are accepted. No rounding, though.
             howManyDecimals = Math.Min(howManyDecimals, 2);
 
-            for (i = 6-wholeNumberAmount; i < wholeNumberAmount+howManyDecimals; i++) {
-                cleanedUp[i] = tempCleanedUp[i];
+            for (i = 0; i < wholeNumberAmount+howManyDecimals; i++) {
+                cleanedUp[6 - wholeNumberAmount+i] = tempCleanedUp[i];
             }
 
             tempCleanedUp = new string(cleanedUp);
@@ -67,7 +72,7 @@ namespace Barcode
 
 
 
-        // Error Index out of bounds with some inputs, like 123 or 001 002
+        // Error Index out of bounds with some inputs, like 123 or 112 113
 
         public static string InputDate(string number)
         {
@@ -77,19 +82,26 @@ namespace Barcode
             int nextField = 0;
             int o = 0; // i offset
             int inputLength = number.Length;
-
-
-            for (int i = 0; i + o < inputLength && nextField <= 2; i++)
+            
+            for (int i = 0; (i + o < inputLength) && nextField <= 2; i++)
             {
                 // Remove non-date garbage from user string.
                 if (Char.IsDigit(number[i + o]))
                 {
-                    // Days and Months. Currently does not limit max values (31 & 12)
+
+                //Console.WriteLine("{0} {1} {2}",i,o,inputLength);
+
                     if (nextField < 2)
                     {
                         //if next char is also a number:
                         if (inputLength >= i + o + 1 && Char.IsDigit(number[i + o + 1]))
                         {
+                            // Test for date limits 31/12
+                            int.TryParse(number.Substring(i + o, 2), out int dateLimits);
+                            if ((nextField == 1 && dateLimits > 12) || (nextField == 0 && dateLimits > 31 ) ) {
+                                Exception e = new FormatException("Incorrect date: " + dateLimits);
+                                throw e;
+                            }
                             fields[nextField] = number.Substring(i + o, 2);
                             o++; // Skips the next char in for-loop
                         }
@@ -126,6 +138,12 @@ namespace Barcode
                     }
                     nextField++;
                 }
+            }
+            // Error if either one field is zero but not another
+            if ((fields[0] == "00") != (fields[1] == "00") != (fields[2] == "0000"))
+            {
+                Exception e = new FormatException("Incorrect date!");
+                throw e;
             }
 
             //output is in format YYMMDD. Zero string is okay.

@@ -28,7 +28,7 @@ namespace Bank_Program
             {
                 // Get user to input a bank number.
                 Console.WriteLine("Please write a bank account number (BBAN or IBAN) 8-14 numbers:");
-                bankNumberTuple = Input.InputBankNumber(Console.ReadLine());
+                bankNumberTuple = Input.InputBankNumber("123456785");// Console.ReadLine());
 
                 // Change bank number into machine format
                 bankNumberTuple = MachineFormat.MachineReadable(bankNumberTuple);
@@ -70,7 +70,7 @@ namespace Bank_Program
             {
                 Console.WriteLine("Please write a reference number (national or international).");
                 Console.WriteLine("Base part is 3-19 numbers and optionally end with one (1) validation number:");
-                refNumber = Console.ReadLine();
+                refNumber = "12345672";//Console.ReadLine();
                 refIsInternational = International.IsInternational(refNumber);
                 string amount = String.Empty;
                 refNumber = RefNumbers.EnsureCorrectInput(refNumber, refIsInternational);
