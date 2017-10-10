@@ -73,6 +73,7 @@ namespace Barcode
 
 
         // Error Index out of bounds with some inputs, like 123 or 112 113
+		// validify with         asd = new DateTime(yyyy,mm,dd);
 
         public static string InputDate(string number)
         {

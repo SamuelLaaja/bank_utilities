@@ -119,7 +119,9 @@ namespace ReferenceNumbers
                 sum += weightedNumber;
             }
 
-            // Calculate the next 10-divisible number from sum
+            // Calculate the next 10-divisible number from sum. 
+			// Math.Ceiling ensures that checksum cannot be 10 greater than sum. 
+			// Always results in single digit number.
             int checksum = (int)Math.Ceiling(sum * 0.1) * 10;
 
             // Insert (checksum - sum) validation number to the end.
