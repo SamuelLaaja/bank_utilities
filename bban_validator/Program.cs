@@ -5,6 +5,7 @@ using Barcode;
 
 // Example bank numbers
 // FI4250001510000023
+// FI23 5298 0620 0301 63
 // 472010225440
 // 123456785
 // 159030776
@@ -28,7 +29,7 @@ namespace Bank_Program
             {
                 // Get user to input a bank number.
                 Console.WriteLine("Please write a bank account number (BBAN or IBAN) 8-14 numbers:");
-                bankNumberTuple = Input.InputBankNumber("123456785");// Console.ReadLine());
+                bankNumberTuple = Input.InputBankNumber("159030776");// Console.ReadLine());
 
                 // Change bank number into machine format
                 bankNumberTuple = MachineFormat.MachineReadable(bankNumberTuple);
