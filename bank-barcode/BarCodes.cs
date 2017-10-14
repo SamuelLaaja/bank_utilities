@@ -37,7 +37,7 @@ namespace Barcode
                 if (Char.IsDigit(number[i]))
                 {
                     if (howManyDecimals > -1)
-                    howManyDecimals++;
+                        howManyDecimals++;
                     tempCleanedUp += number[i];
                 }
             }
@@ -46,21 +46,23 @@ namespace Barcode
                 howManyDecimals = 0;
 
             int wholeNumberAmount = tempCleanedUp.Length - howManyDecimals;
-            if (wholeNumberAmount > 6) {
-                Exception e = new FormatException("Invoice amount has to be less than a million!");
-                throw e; 
+            if (wholeNumberAmount > 6)
+            {
+                Console.WriteLine("Barcode does not support invoice amount that is a million or more. Zero invoice is used instead.");
+                return "00000000";
             }
 
             //only first two decimals are accepted. No rounding, though.
             howManyDecimals = Math.Min(howManyDecimals, 2);
 
-            for (i = 0; i < wholeNumberAmount+howManyDecimals; i++) {
-                cleanedUp[6 - wholeNumberAmount+i] = tempCleanedUp[i];
+            for (i = 0; i < wholeNumberAmount + howManyDecimals; i++)
+            {
+                cleanedUp[6 - wholeNumberAmount + i] = tempCleanedUp[i];
             }
 
             tempCleanedUp = new string(cleanedUp);
 
-            if (tempCleanedUp =="00000000")
+            if (tempCleanedUp == "00000000")
             {
                 Exception e = new FormatException("Thank you for using our services!");
                 throw e;
@@ -71,10 +73,6 @@ namespace Barcode
         }
 
 
-
-        // Error Index out of bounds with some inputs, like 123 or 112 113
-		// validify with         asd = new DateTime(yyyy,mm,dd);
-
         public static string InputDate(string number)
         {
             // Input is expected in format DD MM YYYY with punctuation or whatever as field separators. Works without separators too.
@@ -83,26 +81,20 @@ namespace Barcode
             int nextField = 0;
             int o = 0; // i offset
             int inputLength = number.Length;
-            
+
             for (int i = 0; (i + o < inputLength) && nextField <= 2; i++)
             {
                 // Remove non-date garbage from user string.
-                if (Char.IsDigit(number[i + o]))
+                if ((i + o < inputLength) && Char.IsDigit(number[i + o]))
                 {
 
-                //Console.WriteLine("{0} {1} {2}",i,o,inputLength);
+                    //Console.WriteLine("{0} {1} {2}",i,o,inputLength);
 
                     if (nextField < 2)
                     {
                         //if next char is also a number:
-                        if (inputLength >= i + o + 1 && Char.IsDigit(number[i + o + 1]))
+                        if ((i + o + 1 < inputLength) && Char.IsDigit(number[i + o + 1]))
                         {
-                            // Test for date limits 31/12
-                            int.TryParse(number.Substring(i + o, 2), out int dateLimits);
-                            if ((nextField == 1 && dateLimits > 12) || (nextField == 0 && dateLimits > 31 ) ) {
-                                Exception e = new FormatException("Incorrect date: " + dateLimits);
-                                throw e;
-                            }
                             fields[nextField] = number.Substring(i + o, 2);
                             o++; // Skips the next char in for-loop
                         }
@@ -112,20 +104,28 @@ namespace Barcode
                             fields[nextField] = new string(new char[] { '0', number[i + o] });
                         }
                     }
-                    // Year can be inputted in YYYY or YY format
+                    // Year can be inputted in YYYY or YY format (also YYY even though barcode format does not support it)
                     else
                     {
-                        if (inputLength >= i + 3 &&
+                        if ((i + o + 3 < inputLength) &&
                             Char.IsDigit(number[i + o]) &&
                             Char.IsDigit(number[i + o + 1]) &&
                             Char.IsDigit(number[i + o + 2]) &&
                             Char.IsDigit(number[i + o + 3]))
                         {
                             fields[nextField] = number.Substring(i + o, 4);
-                            o = o + 3; // Skips the 3 next chars in for-loop
+                            o = o + 3; // Skips the 3 next chars in for-loop + (i++)
+                        }
+                        else if ((i + o + 2 < inputLength) &&
+                            Char.IsDigit(number[i + o]) &&
+                            Char.IsDigit(number[i + o + 1]) &&
+                            Char.IsDigit(number[i + o + 2]))
+                        {
+                            fields[nextField] = "2" + number.Substring(i + o, 3);
+                            o = o + 2; // Skips the 2 next chars in for-loop + (i++)
                         }
                         //if next char is also a number:
-                        else if (inputLength >= i + o + 1 && Char.IsDigit(number[i + o + 1]))
+                        else if ((i + o + 1 < inputLength) && Char.IsDigit(number[i + o + 1]))
                         {
                             fields[nextField] = new string(new char[] { '2', '0', number[i + o], number[i + o + 1] });
                             o++; // Skips the next char in for-loop
@@ -140,15 +140,123 @@ namespace Barcode
                     nextField++;
                 }
             }
-            // Error if either one field is zero but not another
-            if ((fields[0] == "00") != (fields[1] == "00") != (fields[2] == "0000"))
+
+            cleanedUp = $"{fields[2]}/{fields[1]}/{fields[0]}";
+            // Tries to put user string into DateType format. If fails, it is not a valid date.
+            // Error if one field is zero but not others. Allows completely zero input fields and completely non-zero input fields.
+            if (cleanedUp != "00/00/0000")
             {
-                Exception e = new FormatException("Incorrect date!");
-                throw e;
+                if (!DateTime.TryParse(cleanedUp, out DateTime tempDate))
+                //|| ((fields[0] == "00") != (fields[1] == "00") != (fields[2] == "0000")))
+                {
+                    Exception e = new FormatException("Incorrect date: " + cleanedUp);
+                    cleanedUp = "00000000";
+                    throw e;
+                }
+                else
+                {
+                    //When everything is correct. Output is in format YYMMDD. 
+                    cleanedUp = fields[2].Substring(2, 2) + fields[1] + fields[0];
+                }
+            }
+            else
+            {
+                //Zero string is okay. Removes / separators.
+                cleanedUp = "00000000";
             }
 
-            //output is in format YYMMDD. Zero string is okay.
-            return fields[2].Substring(2, 2) + fields[1] + fields[0];
+            return cleanedUp;
         }
+        /// <summary>
+        /// Fills string beginning with 0's and rest with given characters
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="totalLength"></param>
+        /// <returns></returns>
+        public static string FillWithZeroPrefix(string input, int totalLength)
+        {
+            char[] newString = new String('0', totalLength).ToCharArray();
+            int inputLength = input.Length;
+            int lengthDiff = totalLength - inputLength;
+            if (inputLength <= totalLength)
+            {
+                for (int i = input.Length - 1; i >= 0; i--)
+                {
+                    newString[i + lengthDiff] = input[i];
+                }
+
+            }
+            return new String(newString);
+        }
+
+
+        public static string Modulo103(string barCode)
+        {
+            foreach (char c in barCode)
+            {
+                if (!Char.IsDigit(c))
+                {
+                    Exception e = new FormatException("Error: Input values should only contain numbers.");
+                    throw e;
+                }
+            }
+
+            // Calculate national validation number (last number)
+            int w = 7;
+            int sum = 0;
+            // Calculate validation number, starting from end
+            for (int i = barCode.Length - 1; i >= 0; i--)
+            {
+                int weightedNumber;
+                int.TryParse(new string(barCode[i], 1), out weightedNumber);
+
+                // Multiply with 7,3,1,7,3,1... for correct weighting
+                // WeightedNumber result can be between 0-81. 
+                weightedNumber *= w;
+
+                switch (w)
+                {
+                    case 7:
+                        w = 3;
+                        break;
+                    case 3:
+                        w = 1;
+                        break;
+                    case 1:
+                        w = 7;
+                        break;
+                }
+                // Add to total sum
+                sum += weightedNumber;
+            }
+
+            // Calculate the next 10-divisible number from sum. 
+            // Math.Ceiling ensures that checksum cannot be 10 greater than sum. 
+            // Always results in single digit number.
+            int checksum = (int)Math.Ceiling(sum * 0.1) * 10;
+
+            // Insert (checksum - sum) validation number to the end.
+            barCode = barCode.Insert(barCode.Length, String.Join(String.Empty, (checksum - sum)));
+
+            return barCode;
+        }
+
+
+        //string tempString = String.Empty;
+        //int tempInt = 0;
+        //// Calculates modulo in partitions of 7 integers, 
+        //// because otherwise bank number is often too long even for ulong ( ulong < 18446744073709551616)
+        //// Follows the example of: http://tarkistusmerkit.teppovuori.fi/tarkmerk.htm#jakojaannos2 
+        //for (int i = 0; i < barCode.Length; i += 7)
+        //{
+        //    if (barCode.Length - i < 7)
+        //        int.TryParse(tempString + barCode.Substring(i), out tempInt);
+        //    else
+        //        int.TryParse(tempString + barCode.Substring(i, 7), out tempInt);
+
+        //    tempString = (tempInt % 103).ToString();
+        //}
+
+        //return tempString;
     }
 }

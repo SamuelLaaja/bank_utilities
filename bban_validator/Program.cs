@@ -22,14 +22,14 @@ namespace Bank_Program
             // Tuple boolean is used to determine if bank number is BBAN or IBAN. null if invalid number.
             Tuple<bool, string> bankNumberTuple = null;
             string refNumber = String.Empty;
-            bool refIsInternational;
+            bool refIsInternational = false;
             bool refValid = false;
 
             try
             {
                 // Get user to input a bank number.
                 Console.WriteLine("Please write a bank account number (BBAN or IBAN) 8-14 numbers:");
-                bankNumberTuple = Input.InputBankNumber("159030776");// Console.ReadLine());
+                bankNumberTuple = Input.InputBankNumber(Console.ReadLine());// "159030776");
 
                 // Change bank number into machine format
                 bankNumberTuple = MachineFormat.MachineReadable(bankNumberTuple);
@@ -71,7 +71,7 @@ namespace Bank_Program
             {
                 Console.WriteLine("Please write a reference number (national or international).");
                 Console.WriteLine("Base part is 3-19 numbers and optionally end with one (1) validation number:");
-                refNumber = "12345672";//Console.ReadLine();
+                refNumber = Console.ReadLine();// "12345672";//Console.ReadLine();
                 refIsInternational = International.IsInternational(refNumber);
                 string amount = String.Empty;
                 refNumber = RefNumbers.EnsureCorrectInput(refNumber, refIsInternational);
@@ -122,7 +122,7 @@ namespace Bank_Program
                 if (bankNumberTuple != null && refNumber != null && refValid)
                 {
                     // Input invoice amount
-                    Console.WriteLine("If you are making an invoice, please insert invoice amount in euros: ");
+                    Console.WriteLine("If you are making an invoice, please insert invoice amount in euros (. or , can be used as decimal separator): ");
                     string invoice = Console.ReadLine();
                     invoice = BarCodes.InputInvoice(invoice);
                     // Input due date
@@ -133,13 +133,26 @@ namespace Bank_Program
                         dueDate = BarCodes.InputDate(dueDate);
 
                         Console.WriteLine("Invoice: {0}  Due date: {1}", invoice, dueDate);
-                        // variables:
-                        // bankNumberTuple <isInternational (bool), bankNumber (string)>
-                        // refNumber (string)
-                        // refIsInternational (bool)
-                        // invoice (string)
-                        // dueDate (string)
-                    }                    
+                        string barCode;
+                        // 105 = Start Code C
+                        if (refIsInternational) // use version 5
+                        {
+                            barCode = "5";
+                            barCode = "105" + "5" + bankNumberTuple.Item2.Substring(2) + invoice + refNumber.Substring(2,2) + BarCodes.FillWithZeroPrefix(refNumber.Substring(4), 21) + dueDate;
+                            //Calculate modulo 103
+                            string mod103 = BarCodes.Modulo103(barCode);
+                            barCode += mod103 + "106"; // STOP
+                        }
+                        else // use version 4
+                        {
+                            barCode = "105" + "4" + bankNumberTuple.Item2.Substring(2)+ invoice + "000" + BarCodes.FillWithZeroPrefix(refNumber, 20) + dueDate;
+                            //Calculate modulo 103
+                            string mod103 = BarCodes.Modulo103(barCode);
+                            barCode += mod103 + "106"; // STOP
+                        }
+
+                        Console.WriteLine(barCode);
+                    }
                 }
             }
             catch (Exception e)
