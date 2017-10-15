@@ -32,7 +32,7 @@ namespace ReferenceNumbers
                 Exception ex = new FormatException("Reference number is too short!");
                 throw ex;
             }
-            else if (refNumberCleanedUp.Length > 19)
+            else if (!isInternational && refNumberCleanedUp.Length > 19)
             {
                 Exception ex = new FormatException("Reference number is too long!");
                 throw ex;

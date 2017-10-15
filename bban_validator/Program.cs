@@ -137,18 +137,17 @@ namespace Bank_Program
                         // 105 = Start Code C
                         if (refIsInternational) // use version 5
                         {
-                            barCode = "5";
-                            barCode = "105" + "5" + bankNumberTuple.Item2.Substring(2) + invoice + refNumber.Substring(2,2) + BarCodes.FillWithZeroPrefix(refNumber.Substring(4), 21) + dueDate;
+                            barCode = "5" + bankNumberTuple.Item2.Substring(2) + invoice + refNumber.Substring(2,2) + BarCodes.FillWithZeroPrefix(refNumber.Substring(4), 21) + dueDate;
                             //Calculate modulo 103
                             string mod103 = BarCodes.Modulo103(barCode);
-                            barCode += mod103 + "106"; // STOP
+                            barCode = "[105] " + BarCodes.WhiteSpaces(barCode) + $"[{mod103}]" + " [106]"; // START, barcode, checksum, STOP
                         }
                         else // use version 4
                         {
-                            barCode = "105" + "4" + bankNumberTuple.Item2.Substring(2)+ invoice + "000" + BarCodes.FillWithZeroPrefix(refNumber, 20) + dueDate;
+                            barCode = "4" + bankNumberTuple.Item2.Substring(2)+ invoice + "000" + BarCodes.FillWithZeroPrefix(refNumber, 20) + dueDate;
                             //Calculate modulo 103
                             string mod103 = BarCodes.Modulo103(barCode);
-                            barCode += mod103 + "106"; // STOP
+                            barCode = "[105] " + BarCodes.WhiteSpaces(barCode) + $"[{mod103}]" + " [106]"; // START, barcode, checksum, STOP
                         }
 
                         Console.WriteLine(barCode);

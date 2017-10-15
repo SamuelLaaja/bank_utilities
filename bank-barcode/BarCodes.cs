@@ -1,21 +1,5 @@
 ﻿using System;
 
-//LASKU 1:
-//Tilinro: Sp. FI79 4405 2020 0360 82 Summa: 4 883,15 Viite: 86851 62596 19897 Eräpäivä: 12.6.2010
-//[105] 47 94 40 52 02 00 36 08 20 04 88 31 50 00 00 00 08 68 51 62 59 61 98 97 10 06 12 [40] [stop] 
-
-//LASKU 2:
-//Tilinro: Nordea FI58 1017 1000 0001 22 Summa: 482,99 Viite: 55958 22432 94671 Eräpäivä: 31.1.2012
-//[105] 45 81 01 71 00 00 00 12 20 00 48 29 90 00 00 00 05 59 58 22 43 29 46 71 12 01 31 [55] [stop]
-
-//LASKU 3:
-//Tilinro: Op.FI02 5000 4640 0013 02 Summa: 693,80 Viite: 69 87567 20834 35364 Eräpäivä: 24.7.2011
-//[105] 40 25 00 04 64 00 01 30 20 00 69 38 00 00 0 0 06 98 75 67 20 83 43 53 64 11 07 24 [14] [stop]
-
-//LASKU 7:
-//Tilinro: SEB FI83 3301 0001 1007 75 Summa: 150000,20 Viite: RF71 9212 5374 2525 3989 7737 Eräpäivä: 25.5.2016
-//[105] 58 33 30 10 00 11 00 77 51 50 00 02 07 10 92 12 53 74 25 25 39 89 77 37 16 05 25 [ 80] [stop] 
-
 namespace Barcode
 {
     public class BarCodes
@@ -200,63 +184,58 @@ namespace Barcode
                     throw e;
                 }
             }
-
-            // Calculate national validation number (last number)
-            int w = 7;
-            int sum = 0;
-            // Calculate validation number, starting from end
-            for (int i = barCode.Length - 1; i >= 0; i--)
+            int sum = 105;
+            int w = 1;
+            // Calculate validation number, starting from position 5 (first weight that is not 1)
+            for (int i = 0; i < barCode.Length; i = i + 2)
             {
                 int weightedNumber;
-                int.TryParse(new string(barCode[i], 1), out weightedNumber);
-
-                // Multiply with 7,3,1,7,3,1... for correct weighting
-                // WeightedNumber result can be between 0-81. 
+                int.TryParse(barCode.Substring(i, 2), out weightedNumber);
                 weightedNumber *= w;
-
-                switch (w)
-                {
-                    case 7:
-                        w = 3;
-                        break;
-                    case 3:
-                        w = 1;
-                        break;
-                    case 1:
-                        w = 7;
-                        break;
-                }
+                //Console.Write(barCode.Substring(i, 2) + $"[{w}] ");
+                //if (w <= 27)
+                //    w++;
+                //else
+                //    w = 1;
+                //w -= 27;
                 // Add to total sum
                 sum += weightedNumber;
             }
-
-            // Calculate the next 10-divisible number from sum. 
-            // Math.Ceiling ensures that checksum cannot be 10 greater than sum. 
-            // Always results in single digit number.
-            int checksum = (int)Math.Ceiling(sum * 0.1) * 10;
-
-            // Insert (checksum - sum) validation number to the end.
-            barCode = barCode.Insert(barCode.Length, String.Join(String.Empty, (checksum - sum)));
-
-            return barCode;
+            return (sum % 103).ToString();
         }
 
 
-        //string tempString = String.Empty;
-        //int tempInt = 0;
-        //// Calculates modulo in partitions of 7 integers, 
-        //// because otherwise bank number is often too long even for ulong ( ulong < 18446744073709551616)
-        //// Follows the example of: http://tarkistusmerkit.teppovuori.fi/tarkmerk.htm#jakojaannos2 
-        //for (int i = 0; i < barCode.Length; i += 7)
-        //{
-        //    if (barCode.Length - i < 7)
-        //        int.TryParse(tempString + barCode.Substring(i), out tempInt);
-        //    else
-        //        int.TryParse(tempString + barCode.Substring(i, 7), out tempInt);
-
-        //    tempString = (tempInt % 103).ToString();
-        //}
-
-        //return tempString;
+        // Add spaces for clarity
+        public static string WhiteSpaces(string refNumber)
+        {
+            // Add spaces every 2 numbers, starting from left side
+            int refLength = refNumber.Length;
+            int offset = 0;
+            if (refLength > 2)
+            {
+                for (int i = 2; i <= refLength + offset; i = i + 3)
+                {
+                    refNumber = refNumber.Insert(i, " ");
+                    offset++;
+                }
+            }
+            return refNumber;
+        }
     }
 }
+
+//LASKU 1:
+//Tilinro: Sp. FI79 4405 2020 0360 82 Summa: 4 883,15 Viite: 86851 62596 19897 Eräpäivä: 12.6.2010
+//[105] 47 94 40 52 02 00 36 08 20 04 88 31 50 00 00 00 08 68 51 62 59 61 98 97 10 06 12 [40] [stop] 
+
+//LASKU 2:
+//Tilinro: Nordea FI58 1017 1000 0001 22 Summa: 482,99 Viite: 55958 22432 94671 Eräpäivä: 31.1.2012
+//[105] 45 81 01 71 00 00 00 12 20 00 48 29 90 00 00 00 05 59 58 22 43 29 46 71 12 01 31 [55] [stop]
+
+//LASKU 3:
+//Tilinro: Op.FI02 5000 4640 0013 02 Summa: 693,80 Viite: 69 87567 20834 35364 Eräpäivä: 24.7.2011
+//[105] 40 25 00 04 64 00 01 30 20 00 69 38 00 00 0 0 06 98 75 67 20 83 43 53 64 11 07 24 [14] [stop]
+
+//LASKU 7:
+//Tilinro: SEB FI83 3301 0001 1007 75 Summa: 150000,20 Viite: RF71 9212 5374 2525 3989 7737 Eräpäivä: 25.5.2016
+//[105] 58 33 30 10 00 11 00 77 51 50 00 02 07 10 92 12 53 74 25 25 39 89 77 37 16 05 25 [ 80] [stop] 
