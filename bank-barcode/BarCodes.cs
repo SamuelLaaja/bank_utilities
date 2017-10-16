@@ -189,12 +189,11 @@ namespace Barcode
             // Calculate validation number, starting from position 5 (first weight that is not 1)
             for (int i = 0; i < barCode.Length; i = i + 2)
             {
-                int weightedNumber;
-                int.TryParse(barCode.Substring(i, 2), out weightedNumber);
+                int.TryParse(barCode.Substring(i, 2), out int weightedNumber);
                 weightedNumber *= w;
                 //Console.Write(barCode.Substring(i, 2) + $"[{w}] ");
                 //if (w <= 27)
-                //    w++;
+                w++;
                 //else
                 //    w = 1;
                 //w -= 27;

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
 
-namespace Bank
+namespace Bank_Tools
 {
     public class BicCode
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Bank
+namespace Bank_Tools
 {
     public class Input
     {

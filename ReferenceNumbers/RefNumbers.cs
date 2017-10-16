@@ -47,7 +47,7 @@ namespace ReferenceNumbers
             if (isInternational)
             {
                 // Replaces letters with numbers
-                refNumber = Bank.International.ReplaceLetters(refNumber);
+                refNumber = Bank_Tools.International.ReplaceLetters(refNumber);
                 string country = refNumber.Substring(0, 6);
                 // Adds country code to the end of string
                 string newOrder = refNumber.Substring(6) + country;
@@ -66,9 +66,8 @@ namespace ReferenceNumbers
 
                     tempString = (tempInt % 97).ToString();
                 }
-
-                int modulo97;
-                if (int.TryParse(tempString, out modulo97))
+                
+                if (int.TryParse(tempString, out int modulo97))
                 {
                     // If modulo resulted to 1, ref number is valid
                     if (modulo97 == 1)
@@ -96,8 +95,7 @@ namespace ReferenceNumbers
             // Calculate validation number, starting from end
             for (int i = refNumber.Length - 1; i >= 0; i--)
             {
-                int weightedNumber;
-                int.TryParse(new string(refNumber[i], 1), out weightedNumber);
+                int.TryParse(new string(refNumber[i], 1), out int weightedNumber);
 
                 // Multiply with 7,3,1,7,3,1... for correct weighting
                 // WeightedNumber result can be between 0-81. 
@@ -154,7 +152,7 @@ namespace ReferenceNumbers
         // Add spaces for clarity
         public static string WhiteSpaces(string refNumber) {
 
-            bool isInternational = Bank.International.IsInternational(refNumber);
+            bool isInternational = Bank_Tools.International.IsInternational(refNumber);
             // Add spaces every 4 numbers, starting from left side
             if (isInternational)
             {

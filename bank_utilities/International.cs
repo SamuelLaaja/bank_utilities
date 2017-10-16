@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Bank
+namespace Bank_Tools
 {
     public class International
     {
@@ -65,9 +65,8 @@ namespace Bank
 
                     tempString = (tempInt % 97).ToString();
                 }
-
-                int modulo97;
-                int.TryParse(tempString, out modulo97);
+                
+                int.TryParse(tempString, out int modulo97);
 
                 modulo97 = 98 - modulo97;
 
